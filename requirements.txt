@@ -1,0 +1,11 @@
+aiogram>=3.10,<4
+aiohttp>=3.9,<4
+dateparser>=1.2,<2
+google-api-python-client>=2.130,<3
+google-auth-httplib2>=0.2,<1
+google-auth-oauthlib>=1.2,<2
+pydantic>=2.7,<3
+pydantic-settings>=2.2,<3
+python-dateutil>=2.9,<3
+supabase>=2.5,<3
+tzdata>=2025.2
