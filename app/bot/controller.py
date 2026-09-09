@@ -33,7 +33,7 @@ class TelegramController:
     async def handle_command(
         self, *, user_id: int, chat_id: int, message_id: int, command: str, text: str
     ) -> BotResponse:
-        if command == "help":
+        if command in {"start", "help"}:
             return BotResponse(HELP_TEXT)
         if command == "cancel":
             await self.service.clear_dialog(user_id)
@@ -291,6 +291,21 @@ class TelegramController:
         return ParsedCommand.model_validate(dialog["command"])
 
     def _preview(self, command: ParsedCommand, operation: str) -> str:
+        reference = f" [{command.item_reference}]" if command.item_reference else ""
+        if operation == "delete":
+            return f"Confirm delete{reference}?"
+        if operation == "edit":
+            changes: list[str] = []
+            if command.title:
+                changes.append(f'title -> "{command.title}"')
+            if command.scheduled_date:
+                changes.append(f"date -> {command.scheduled_date}")
+            if command.start_time:
+                changes.append(f"time -> {command.start_time.strftime('%H:%M')}")
+            if command.duration_minutes:
+                changes.append(f"duration -> {command.duration_minutes} min")
+            return f"Confirm edit{reference}: {', '.join(changes)}?"
+
         title = command.title or "Untitled"
         target = getattr(command.target, "value", str(command.target))
         date = command.scheduled_date or "no date"
@@ -298,7 +313,6 @@ class TelegramController:
         duration = (
             f", {command.duration_minutes} min" if command.duration_minutes else ""
         )
-        reference = f" [{command.item_reference}]" if command.item_reference else ""
         return f"Confirm {operation} {target}{reference}: {title} ({date}, {clock}{duration})?"
 
     def _item_response(self, label: str, item: Any, *, undo: bool = False) -> BotResponse:

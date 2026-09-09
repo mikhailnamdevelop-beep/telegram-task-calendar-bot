@@ -148,6 +148,9 @@ async def test_edit_and_delete_wait_for_confirmation() -> None:
         command="edit",
         text="T-1234abcd перенести на послезавтра",
     )
+    assert edit.text.startswith("Confirm edit [T-1234abcd]: date -> ")
+    assert "None" not in edit.text
+    assert "Untitled" not in edit.text
     assert edit.buttons[0].data == "confirm:edit"
     assert not service.calls
     updated = await controller.handle_callback(user_id=7, data="confirm:edit")
@@ -160,6 +163,7 @@ async def test_edit_and_delete_wait_for_confirmation() -> None:
         command="delete",
         text="T-1234abcd",
     )
+    assert delete.text == "Confirm delete [T-1234abcd]?"
     assert delete.buttons[0].data == "confirm:delete"
     deleted = await controller.handle_callback(user_id=7, data="confirm:delete")
     assert deleted.text.startswith("Deleted:")
@@ -217,6 +221,10 @@ async def test_help_unknown_empty_and_empty_agenda() -> None:
         user_id=7, chat_id=8, message_id=1, command="help", text=""
     )
     assert "/calendar" in help_response.text
+    start_response = await controller.handle_command(
+        user_id=7, chat_id=8, message_id=1, command="start", text=""
+    )
+    assert start_response.text == help_response.text
     unknown = await controller.handle_command(
         user_id=7, chat_id=8, message_id=2, command="wat", text="x"
     )

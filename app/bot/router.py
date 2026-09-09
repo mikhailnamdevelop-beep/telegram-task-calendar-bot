@@ -10,7 +10,7 @@ from .controller import TelegramController
 from .middleware import AllowlistMiddleware
 from .rendering import coerce_response, markup
 
-COMMANDS = ("task", "calendar", "both", "agenda", "edit", "delete", "done", "today", "tomorrow", "week", "cancel", "help")
+COMMANDS = ("start", "task", "calendar", "both", "agenda", "edit", "delete", "done", "today", "tomorrow", "week", "cancel", "help")
 
 
 def create_router(controller: TelegramController, allowed_user_ids: set[int]) -> Router:
